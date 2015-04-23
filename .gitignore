@@ -1,2 +1,7 @@
 *.csv
 *.ipynb
+.Rproj.user
+
+.RData
+
+.Rhistory

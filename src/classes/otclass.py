@@ -64,7 +64,7 @@ class OttoProject:
     def lda(self, n=None):
         model = LDA(solver="eigen", n_components=n)
         model.fit(X=self.train_features, y=self.train_classes)
-        self.lda_train_features = model.transform(X=self.lda_train_features)
+        self.lda_train_features = model.transform(X=self.train_features)
         self.lda_test = model.transform(self.test)
         self.lda_coef = model.coef_
 
@@ -99,3 +99,9 @@ class OttoProject:
 if __name__ == "__main__":
     op = OttoProject("../../data/")
     op.load_original()  # load untransformed data
+    op_pca = OttoProject("../../data/")
+    op_pca.load_pca(40)
+    print op_pca.pca_explained_variance
+    op_lda = OttoProject("../../data/")
+    op_lda.load_lda(40)
+    print op.lda_coef

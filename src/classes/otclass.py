@@ -104,4 +104,3 @@ if __name__ == "__main__":
     print op_pca.pca_explained_variance
     op_lda = OttoProject("../../data/")
     op_lda.load_lda(40)
-    print op.lda_coef

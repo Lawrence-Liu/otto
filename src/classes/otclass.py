@@ -21,6 +21,7 @@ class OttoProject:
         self.lda_train_features = []
         self.lda_test = []
         self.lda_coef = []
+
     def load_csv(self):
         train_list = []
         with open(self.PATH+"train.csv", "r") as f:
@@ -29,17 +30,20 @@ class OttoProject:
                 line = line.strip().split(',')
                 del line[0]
                 self.train_classes.append(line.pop(93))
+                line = map(float, line)
                 self.train_features.append(line)
-        with open(self.PATH+"test.csv","r") as f:
+        with open(self.PATH+"test.csv", "r") as f:
             test_header = f.readline()
-            for line in f.readlinse():
+            for line in f.readlines():
                 line = line.strip().split(',')
                 del line[0]
+                line = map(float, line)
                 self.test.append(line)
 
     def trans_to_array(self):
         self.train_features = np.array(self.train_features)
         self.test = np.array(self.test)
+        self.train_classes = np.array(self.train_classes)
 
     def write_result(name, self):
         with open(name, "w") as f:
@@ -72,27 +76,26 @@ class OttoProject:
             self.evaluate_features = train_features[test_index]
             self.evaluate_classes = self.train_classes[test_index]
 
-
     def load_original(self):
-        self.load_csv(self)
-        self.trans_to_array(self)
-        self.stratified_shuffle(self, self.train_features)
+        self.load_csv()
+        self.trans_to_array()
+        self.stratified_shuffle( self.train_features)
         return self.subtrain_features, self.subtrain_classes, self.evaluate_features, self.evaluate_classes
 
     def load_pca(self, n=None):
-        self.load_csv(self)
-        self.trans_to_array(self)
-        self.pca(self, n)
-        self.stratified_shuffle(self, self.pca_train_features)
+        self.load_csv()
+        self.trans_to_array()
+        self.pca(n)
+        self.stratified_shuffle(self.pca_train_features)
         return self.subtrain_features, self.subtrain_classes, self.evaluate_features, self.evaluate_classes
 
-    def load_lda(self,n=None):
-        self.load_csv(self)
-        self.trans_to_array(self)
-        self.lda(self, n)
-        self.stratified_shuffle(self,self.lda_train_features)
+    def load_lda(self, n=None):
+        self.load_csv()
+        self.trans_to_array()
+        self.lda(n)
+        self.stratified_shuffle(self.lda_train_features)
         return self.subtrain_features, self.subtrain_classes, self.evaluate_features, self.evaluate_classes
 
 if __name__ == "__main__":
-    op = OttoProject("../data/")
+    op = OttoProject("../../data/")
     op.load_original()  # load untransformed data

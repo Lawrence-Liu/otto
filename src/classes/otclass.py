@@ -36,6 +36,9 @@ class OttoProject:
     def pca(self, n=None):
         model = PCA(n_components=n)
         model.fit(self.train_features)
-        return model.transform(self.train_features),model.explained_variance_ratio_
+        return model.transform(self.train_features), model.explained_variance_ratio_
 
     def lda(self, n=None):
+        model = LDA(solver="eigen", n_components=n)
+        model.fit(X=self.train_features, y=self.train_classes)
+        return model.transform(X=self.train_features), model.coef_

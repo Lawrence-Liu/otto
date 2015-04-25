@@ -1,7 +1,7 @@
 __author__ = 'Zhao'
 import numpy as np
 from sklearn.decomposition import PCA
-
+from sklearn.lda import LDA
 class OttoProject:
     def __init__(self):
         self.PATH = ""
@@ -35,4 +35,7 @@ class OttoProject:
 
     def pca(self, n=None):
         model = PCA(n_components=n)
-        return model.fit_transform(self.train_features)
+        model.fit(self.train_features)
+        return model.transform(self.train_features),model.explained_variance_ratio_
+
+    def lda(self, n=None):

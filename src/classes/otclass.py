@@ -1,6 +1,6 @@
 __author__ = 'Zhao'
 import numpy as np
-
+from sklearn.decomposition import PCA
 
 class OttoProject:
     def __init__(self):
@@ -32,3 +32,7 @@ class OttoProject:
                 + str(self.result[i][2])+','+str(self.result[i][3])+','+str(self.result[i][4])
                  + ','+str(self.result[i][5])+','+str(self.result[i][6])+','+str(self.result[i][7])
                  + ','+str(self.result[i][8])+'\n')
+
+    def pca(self, n=None):
+        model = PCA(n_components=n)
+        return model.fit_transform(self.train_features)

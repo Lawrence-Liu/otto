@@ -8,6 +8,7 @@ op = OttoProject("../data/")
 op.load_original()
 train = op.train_features
 label = op.train_classes
+f.write("Successfully load data.\n")
 svr = SVC(probability=True)
 param_grid = [{"C": [0.001, 0.01, 0.1, 1, 10, 100], "gamma":[0.1, 0.01, 0.001, 0.0001]}]
 if __name__ == '__main__':
@@ -21,8 +22,14 @@ if __name__ == '__main__':
     cv_7v8 = GridSearchCV(svr, param_grid, n_jobs=-1)
     cv_1v9 = GridSearchCV(svr, param_grid, n_jobs=-1)
     cv_2v3.fit(train_2v3, label_2v3)
+    f.write("cross validation 2v3 complete.\n")
+    f.write("C:{0}, gamma:{1}\n".format(str(cv_2v3.best_params_["C"]), str(cv_2v3.best_params_['gamma'])))
     cv_7v8.fit(train_7v8, label_7v8)
+    f.write("cross validation 7v8 complete.\n")
+    f.write("C:{0}, gamma:{1}\n".format(str(cv_7v8.best_params_["C"]), str(cv_7v8.best_params_['gamma'])))
     cv_1v9.fit(train_1v9, label_1v9)
+    f.write("cross validation 1v9 complete.\n")
+    f.write("C:{0}, gamma:{1}\n".format(str(cv_1v9.best_params_["C"]), str(cv_1v9.best_params_['gamma'])))
     model_2v3 = SVC(C=cv_2v3.best_params_["C"], gamma=cv_2v3.best_params_["gamma"], probability=True)
     model_7v8 = SVC(C=cv_7v8.best_params_["C"], gamma=cv_7v8.best_params_["gamma"], probability=True)
     model_1v9 = SVC(C=cv_1v9.best_params_["C"], gamma=cv_1v9.best_params_["gamma"], probability=True)
@@ -30,21 +37,27 @@ if __name__ == '__main__':
     model_5 = SVC(C=10, gamma=0.01, probability=True)
     label_5 = (label == "Class_5")
     model_5.fit(train, label_5)
+    f.write("model_5 fitted.\n")
     model_4 = SVC(C=10, gamma=0.01, probability=True)
     label_4 = (label == "Class_4")
     model_4.fit(train, label_4)
+    f.write("model_4 fitted.\n")
     model_6 = SVC(C=10, gamma=0.001, probability=True)
     label_6 = (label == "Class_6")
     model_6.fit(train, label_6)
+    f.write("model_6 fitted.\n")
     model_23 = SVC(C=100, gamma=0.001, probability=True)
     label_23 = (label == "Class_2")+(label == "Class_3")
     model_23.fit(train, label_23)
+    f.write("model_23 fitted.\n")
     model_78 = SVC(C=10, gamma=0.001, probability=True)
     label_78 = (label == "Class_7")+(label == "Class_8")
     model_78.fit(train, label_78)
+    f.write("model_78 fitted.\n")
     model_19 = SVC(C=100, gamma=0.001, probability=True)
     label_19 = (label == "Class_1")+(label == "Class_9")
     model_19.fit(train, label_19)
+    f.write("model_19 fitted.\n")
     N = np.shape(op.test)[0]
     index_5 = list(model_5.classes_).index(True)
     index_4 = list(model_4.classes_).index(True)
@@ -83,7 +96,8 @@ if __name__ == '__main__':
         prob[6] = rest*pred_7[0][index_7]
         prob[7] = rest*pred_7[0][1-index_7]
         op.result.append(prob)
+        f.write("completed output {0}\n".format(str(i)))
     op.write_result("submission_msvm.csv")
-
+f.close()
 
 

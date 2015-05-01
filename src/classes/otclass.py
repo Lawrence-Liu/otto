@@ -45,14 +45,11 @@ class OttoProject:
         self.test = np.array(self.test)
         self.train_classes = np.array(self.train_classes)
 
-    def write_result(name, self):
-        with open(name, "w") as f:
+    def write_result(self, name):
+        with open(self.PATH+name, "w") as f:
             f.write("id,Class_1,Class_2,Class_3,Class_4,Class_5,Class_6,Class_7,Class_8,Class_9\n")
             for i in xrange(144368):
-                f.write(str(i+1)+','+str(self.result[i][0])+','+str(self.result[i][1])+','
-                + str(self.result[i][2])+','+str(self.result[i][3])+','+str(self.result[i][4])
-                 + ','+str(self.result[i][5])+','+str(self.result[i][6])+','+str(self.result[i][7])
-                 + ','+str(self.result[i][8])+'\n')
+                f.write(str(i+1)+','+str(self.result[i][0])+','+str(self.result[i][1])+',' + str(self.result[i][2])+','+ str(self.result[i][3])+','+str(self.result[i][4]) + ','+str(self.result[i][5])+','+str(self.result[i][6])+','+str(self.result[i][7]) + ','+str(self.result[i][8])+'\n')
 
     def pca(self, n):
         model = PCA(n_components=n)

@@ -13,7 +13,7 @@ model = SVC(probability=True)
 params = [{'C': np.exp2(range(-5, 15)), 'gamma': np.exp2(range(-16, 9))}]
 f = open("log.txt", "w")
 if __name__ == "__main__":
-    clf = GridSearchCV(estimator=model, param_grid=params, n_jobs=6, cv=5)
+    clf = GridSearchCV(estimator=model, param_grid=params, n_jobs=-1, cv=5)
     clf.fit(train, train_label)
     op.result = clf.predict_proba(test)
     op.write_result("submission-0503-svm.csv")

@@ -4,12 +4,19 @@ from sklearn.grid_search import GridSearchCV
 from sklearn.svm import SVC
 import numpy as np
 from sklearn.metrics import log_loss
+import pandas as pd
 import random
 op = OttoProject('../data/')
 op.load_original()
 train = op.train_features
+train = pd.DataFrame(np.log(train+1))
+means = np.mean(train)
+stds = np.std(train)
+train = (train-means)/stds  # centralization
 train_label = op.train_classes
 test = op.test
+test = pd.DataFrame(np.log(test+1))
+test = (test-means)/stds
 model = SVC(probability=True)
 params = [{'C': np.exp2(range(-5, 15)), 'gamma': np.exp2(range(-16,9))}]
 f = open("log.txt", "w")

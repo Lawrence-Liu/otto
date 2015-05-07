@@ -5,6 +5,7 @@ This svm script is designed to run on a single machine to test one set of tuning
 """
 from classes.otclass import OttoProject
 from sklearn.grid_search import GridSearchCV
+from sklearn.preprocessing import LabelBinarizer
 from sklearn.svm import SVC
 import numpy as np
 import pandas as pd
@@ -65,7 +66,7 @@ l11 = logloss(test_label, pred_test)
 
 #write result
 
-f = open(op.path + "log_"+str(args.integers[0])+"_"+str(args.integers[1])+".txt", "w")
+f = open(op.PATH + "log_"+str(args.integers[0])+"_"+str(args.integers[1])+".txt", "w")
 f.write("model: " + str(model) + "\n")
 f.write("train_logloss,test_logloss\n")
 f.write(str(l00) + "," + str(l01) + "\n")

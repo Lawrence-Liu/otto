@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 from sklearn.lda import LDA
 from sklearn.cross_validation import StratifiedShuffleSplit
+import random
 class OttoProject:
     def __init__(self, path="", split_size=0.2):
         self.PATH = path  # the path to parent directory saving test.csv and train.csv, such as "../data/", or "~/"
@@ -67,6 +68,7 @@ class OttoProject:
         self.lda_coef = model.coef_
 
     def stratified_shuffle(self, train_features): # train_features must be array like
+        random.seed(111)
         sss = StratifiedShuffleSplit(self.train_classes, n_iter=1, test_size=self.split_size)
         for train_index, test_index in sss:
             self.subtrain_features = train_features[train_index]
@@ -78,7 +80,6 @@ class OttoProject:
         self.load_csv()
         self.trans_to_array()
         self.stratified_shuffle( self.train_features)
-        return self.subtrain_features, self.subtrain_classes, self.evaluate_features, self.evaluate_classes
 
     def load_pca(self, n=None):
         self.load_csv()

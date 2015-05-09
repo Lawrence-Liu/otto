@@ -15,4 +15,7 @@ if __name__ == '__main__':
     print str(clf.best_score_)+"\n"
     print str(clf.best_params_)+"\n"
     print str(clf.grid_scores_)+"\n"
+    f=open("log_cv_svm.txt","w")
+    f.write(str(clf.grid_scores_))
+    f.close()
 

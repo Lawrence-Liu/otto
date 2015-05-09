@@ -6,8 +6,8 @@ import numpy as np
 if __name__ == '__main__':
     op = OttoProject("../data/")
     op.load_original()
-    range_gamma = list(np.exp2(range(-5, 15)))
-    range_C = list(np.exp2(range(-16,9)))
+    range_C = list(np.exp2(range(-5, 15)))
+    range_gamma = list(np.exp2(range(-16,9)))
     params = [{"gamma":range_gamma, "C":range_C}]
     svr = SVC()
     clf = GridSearchCV(svr,params,n_jobs=6,verbose=2)

@@ -3,7 +3,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier as RFC
 from sklearn.grid_search import GridSearchCV
 
-op = OttoProject("../data/train.csv")
+op = OttoProject("../data/")
 op.load_original()
 #range_n_estimators = [100,300, 900, 1500]
 #range_max_features = [3, 10, 30]

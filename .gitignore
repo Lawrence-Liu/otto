@@ -1,7 +1,7 @@
 *.csv
 *.ipynb
 .Rproj.user
-
+*.txt
 .RData
 
 .Rhistory

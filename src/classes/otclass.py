@@ -5,9 +5,11 @@ from sklearn.lda import LDA
 from sklearn.cross_validation import StratifiedShuffleSplit
 import random
 class OttoProject:
-    def __init__(self, path="", split_size=0.2):
+    def __init__(self, path="", split_size=0.2, seed=111):
+
         self.PATH = path  # the path to parent directory saving test.csv and train.csv, such as "../data/", or "~/"
         self.split_size = split_size
+        self.seed = seed
         self.train_header = [] # header of train.csv
         self.train_features = []  # feature set of train.csv
         self.train_classes = []  # class set of train.csv
@@ -68,8 +70,7 @@ class OttoProject:
         self.lda_coef = model.coef_
 
     def stratified_shuffle(self, train_features): # train_features must be array like
-        random.seed(111)
-        sss = StratifiedShuffleSplit(self.train_classes, n_iter=1, test_size=self.split_size)
+        sss = StratifiedShuffleSplit(self.train_classes, n_iter=1, test_size=self.split_size,random_state=self.seed)
         for train_index, test_index in sss:
             self.subtrain_features = train_features[train_index]
             self.subtrain_classes = self.train_classes[train_index]

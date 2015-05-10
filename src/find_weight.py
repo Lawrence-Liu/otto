@@ -25,6 +25,7 @@ eva_svm = []
 eva_xgb_444 = []
 eva_xgb_sub = []
 eva_xgb_sub_shr = []
+eva_nn_default = []
 f = open('../eva_weight/eva_rf_1000.csv','r')
 f.readline()
 for l in f.readlines():
@@ -63,48 +64,64 @@ for l in f.readlines():
     l = map(float, l)
     eva_xgb_sub_shr.append(l)
 f.close()
+
+f = open('../eva_weight/eva_nn_19.csv','r')
+for l in f.readlines():
+    l = l.strip().split(',')
+    l = map(float, l)
+    eva_nn_default.append(l)
+f.close()
+
 eva_xgb_sub_shr=np.array(eva_xgb_sub_shr)
 
 eva_xgb_444 = np.array(eva_xgb_444)
 eva_xgb_sub = np.array(eva_xgb_sub)
 eva_rf = np.array(eva_rf)
 eva_svm = np.array(eva_svm)
-
+eva_nn_default = np.array(eva_nn_default)
 vd_label = op.evaluate_classes
-a = 25.0
-b = 25.0
-c = 25.0
-d = 25.0
-e = 0.0
+a = 40.0
+b = 8.0
+c = 2.0
+d = 5.0
+e = 45.0
+f = 0.0
 sig = 1
 while sig == 1:
-    base = logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e)/100)
-    if base > logloss(vd_label,(eva_xgb_444*(a-1.0)+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e+1.0))/100.0) and a>0:
+    base = logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*f)/100)
+    if base > logloss(vd_label,(eva_xgb_444*(a-1.0)+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*(f+1.0))/100.0) and a>0:
         a = a-1.0
-        e = e+1.0
-    elif base > logloss(vd_label,(eva_xgb_444*(a+1.0)+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e-1.0))/100.0) and e>0:
-        a = a+1.0
+        f = f+1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e-1.0)+eva_nn_default*(f+1.0))/100.0) and e>0:
         e = e-1.0
-    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*(d-1.0)+eva_xgb_sub_shr*(e+1.0))/100.0) and d>0:
-        d = d-1.0
-        e = e+1.0
-    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*(d+1.0)+eva_xgb_sub_shr*(e-1.0))/100.0) and e>0:
-        d = d+1.0
-        e = e-1.0
-    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*(b-1.0)+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e+1.0))/100.0) and b>0:
+        f = f+1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*(b-1.0)+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*(f+1.0))/100.0) and b>0:
         b = b-1.0
-        e = e+1.0
-    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*(b+1.0)+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e-1.0))/100.0) and e>0:
-        b = b+1.0
-        e = e-1.0
-    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*(c-1.0)+eva_xgb_sub*d+eva_xgb_sub_shr*(e+1.0))/100.0) and c>0:
+        f = f+1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*(d-1.0)+eva_xgb_sub_shr*e+eva_nn_default*(f+1.0))/100.0) and d>0:
+        d = d-1.0
+        f = f+1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*(c-1.0)+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*(f+1.0))/100.0) and c>0:
         c = c-1.0
+        f = f+1.0
+
+    elif base > logloss(vd_label,(eva_xgb_444*(a+1.0)+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*(f-1.0))/100.0) and f>0:
+        a = a+1.0
+        f = f-1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e+1.0)+eva_nn_default*(f-1.0))/100.0) and f>0:
         e = e+1.0
-    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*(c+1.0)+eva_xgb_sub*d+eva_xgb_sub_shr*(e-1.0))/100.0) and e>0:
+        f = f-1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*(b+1.0)+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*(f-1.0))/100.0) and f>0:
+        b = b+1.0
+        f = f-1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*(d+1.0)+eva_xgb_sub_shr*e+eva_nn_default*(f-1.0))/100.0) and f>0:
+        d = d+1.0
+        f = f-1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*(c-1.0)+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*(f+1.0))/100.0) and c>0:
         c = c+1.0
-        e = e-1.0
+        f = f-1.0
 
     else:
         sig = 0
-print [a,b,c,d,e]
+print [a,b,c,d,e,f]
 print base

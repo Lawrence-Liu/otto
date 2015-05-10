@@ -9,8 +9,8 @@ from sklearn.ensemble import GradientBoostingClassifier as GBC
 from sklearn.ensemble import RandomForestClassifier as RFC
 from classes.otclass import OttoProject
 from sklearn.preprocessing import LabelBinarizer
-
-
+op = OttoProject("../data/")
+op.load_original()
 
 def logloss(act, pred):
     epsilon = 10 ** -15
@@ -20,35 +20,91 @@ def logloss(act, pred):
     act_binary = lb.transform(act)
     logloss = - np.sum(np.multiply(act_binary, np.log(pred))) / pred.shape[0]
     return logloss
+eva_rf = []
+eva_svm = []
+eva_xgb_444 = []
+eva_xgb_sub = []
+eva_xgb_sub_shr = []
+f = open('../eva_weight/eva_rf_1000.csv','r')
+f.readline()
+for l in f.readlines():
+    l = l.strip().split(',')
+    del l[0]
+    l = map(float, l)
+    eva_rf.append(l)
+f.close()
 
+f = open('../eva_weight/eva_svm_100-0.001.csv','r')
+f.readline()
+for l in f.readlines():
+    l = l.strip().split(',')
+    del l[0]
+    l = map(float, l)
+    eva_svm.append(l)
+f.close()
 
-op = OttoProject("../data/")
-op.load_original()
-train = op.subtrain_features
-vd = op.evaluate_features
-train = pd.DataFrame(np.log(train+1))
-vd = pd.DataFrame(np.log(vd+1))
-means = np.mean(train)
-stds = np.std(train)
-train = (train-means)/stds
-vd = (vd-means)/stds
+f = open('../eva_weight/eva_xgb_0.1_444.csv','r')
+for l in f.readlines():
+    l = l.strip().split(',')
+    l = map(float, l)
+    eva_xgb_444.append(l)
+f.close()
 
-model1 = SVC(C=100, gamma=0.001, probability=True)
-model2 = GBC(n_estimators=300, verbose=2)
-model3 = RFC(n_estimators=1000, n_jobs=3)
-model1.fit(train, op.subtrain_classes)
-model2.fit(train, op.subtrain_classes)
-model3.fit(train, op.subtrain_classes)
-eva1 = model1.predict_proba(vd)
-eva2 = model2.predict_proba(vd)
-eva3 = model3.predict_proba(vd)
+f = open('../eva_weight/eva_xgb_sub0.5.csv','r')
+for l in f.readlines():
+    l = l.strip().split(',')
+    l = map(float, l)
+    eva_xgb_sub.append(l)
+f.close()
 
-ll = [[],[]]
-for x in range(0,101):
-    for y in range(0,101-x):
-        ll[0].append(logloss(op.evaluate_classes,eva1*x/100.0+eva2*y/100.0+eva3*(1-x/100.0-y/100.0)))
-        ll[1].append([x,y])
-minimum = min(ll[0])
-index = ll[0].index(minimum)
-weight = [ll[1][index][0],ll[1][index][1],100-ll[1][index][0]-ll[1][index][1]]
-print weight
+f=open('../eva_weight/eva_sub_0.1.csv','r')
+for l in f.readlines():
+    l = l.strip().split(',')
+    l = map(float, l)
+    eva_xgb_sub_shr.append(l)
+f.close()
+eva_xgb_sub_shr=np.array(eva_xgb_sub_shr)
+
+eva_xgb_444 = np.array(eva_xgb_444)
+eva_xgb_sub = np.array(eva_xgb_sub)
+eva_rf = np.array(eva_rf)
+eva_svm = np.array(eva_svm)
+
+vd_label = op.evaluate_classes
+a = 25.0
+b = 25.0
+c = 25.0
+d = 25.0
+e = 0.0
+sig = 1
+while sig == 1:
+    base = logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e)/100)
+    if base > logloss(vd_label,(eva_xgb_444*(a-1.0)+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e+1.0))/100.0) and a>0:
+        a = a-1.0
+        e = e+1.0
+    elif base > logloss(vd_label,(eva_xgb_444*(a+1.0)+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e-1.0))/100.0) and e>0:
+        a = a+1.0
+        e = e-1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*(d-1.0)+eva_xgb_sub_shr*(e+1.0))/100.0) and d>0:
+        d = d-1.0
+        e = e+1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*(d+1.0)+eva_xgb_sub_shr*(e-1.0))/100.0) and e>0:
+        d = d+1.0
+        e = e-1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*(b-1.0)+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e+1.0))/100.0) and b>0:
+        b = b-1.0
+        e = e+1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*(b+1.0)+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*(e-1.0))/100.0) and e>0:
+        b = b+1.0
+        e = e-1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*(c-1.0)+eva_xgb_sub*d+eva_xgb_sub_shr*(e+1.0))/100.0) and c>0:
+        c = c-1.0
+        e = e+1.0
+    elif base > logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*(c+1.0)+eva_xgb_sub*d+eva_xgb_sub_shr*(e-1.0))/100.0) and e>0:
+        c = c+1.0
+        e = e-1.0
+
+    else:
+        sig = 0
+print [a,b,c,d,e]
+print base

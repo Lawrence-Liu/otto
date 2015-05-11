@@ -80,15 +80,18 @@ eva_rf = np.array(eva_rf)
 eva_svm = np.array(eva_svm)
 eva_nn_default = np.array(eva_nn_default)
 vd_label = op.evaluate_classes
-a = 40.0
-b = 8.0
-c = 2.0
-d = 5.0
-e = 45.0
+a = 20.0
+b = 20.0
+c = 20.0
+d = 20.0
+e = 20.0
 f = 0.0
 sig = 1
+
+tmp = eva_xgb_sub
+eva_xgb_sub = eva_xgb_140
 while sig == 1:
-    base = logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*f)/100)
+    base = logloss(vd_label,(eva_xgb_444*a+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*f)/100.0)
     if base > logloss(vd_label,(eva_xgb_444*(a-1.0)+eva_svm*b+eva_rf*c+eva_xgb_sub*d+eva_xgb_sub_shr*e+eva_nn_default*(f+1.0))/100.0) and a>0:
         a = a-1.0
         f = f+1.0

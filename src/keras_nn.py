@@ -9,6 +9,7 @@ from keras.layers.core import Dense, Dropout, Activation
 from keras.layers.normalization import BatchNormalization
 from keras.layers.advanced_activations import PReLU
 from keras.utils import np_utils, generic_utils
+from keras.optimizers import SGD
 
 from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import StandardScaler
@@ -46,27 +47,6 @@ def logloss(act, pred):
     logloss = - np.sum(np.multiply(act_binary, np.log(pred))) / pred.shape[0]
     return logloss
 
-def load_data_2(path, train=True):
-    op = OttoProject(path)
-    if train:
-        train = pd.DataFrame(op.subtrain_features).astype(np.float32)
-        labels = pd.DataFrame(op.subtrain_classes)
-        return train, labels
-    else:
-        test = pd.DataFrame(op.test).astype(np.float32)
-        return test
-
-
-def load_data(path, train=True):
-    df = pd.read_csv(path)
-    X = df.values.copy()
-    if train:
-        np.random.shuffle(X) # https://youtu.be/uyUXoap67N8
-        X, labels = X[:, 1:-1].astype(np.float32), X[:, -1]
-        return X, labels
-    else:
-        X, ids = X[:, 1:].astype(np.float32), X[:, 0].astype(str)
-        return X, ids
 
 def preprocess_data(X, scaler=None):
     if not scaler:
@@ -105,8 +85,9 @@ vd = pd.DataFrame(op.evaluate_features).astype(np.float32)
 vd_labels = pd.DataFrame(op.evaluate_classes)
 X_test = pd.DataFrame(op.test).astype(np.float32)
 X, scaler = preprocess_data(X)
-y, encoder = preprocess_labels(labels)
-
+lb = LabelBinarizer()
+lb.fit(labels)
+y = lb.transform(labels)
 X_test, _ = preprocess_data(X_test, scaler)
 vd, _ = preprocess_data(vd, scaler)
 
@@ -137,15 +118,17 @@ model.add(Dropout(0.5))
 model.add(Dense(512, nb_classes, init='glorot_uniform'))
 model.add(Activation('softmax'))
 
-model.compile(loss='categorical_crossentropy', optimizer="adam")
+model.compile(loss='categorical_crossentropy', optimizer=SGD(lr=0.01, momentum=0.9, nesterov=True))
 
 print("Training model...")
 
-model.fit(X, y, nb_epoch=19, batch_size=16, validation_split=0)
-
+model.fit(X, y, nb_epoch=30, batch_size=16, validation_split=0)
+eva_nn = model.predict_proba(vd)
+print("logloss\n")
+print(str(logloss(vd_labels,eva_nn)))
+'''
 print("Generating submission...")
 
-eva_nn = model.predict_proba(vd)
 f = open('eva_nn_19.csv','w')
 for l in eva_nn:
     for i in xrange(8):
@@ -160,10 +143,11 @@ train_labels = pd.DataFrame(op.train_classes)
 
 test2 = pd.DataFrame(op.test).astype(np.float32)
 X_train, scaler2 = preprocess_data(X_train)
-y2, encoder2 = preprocess_labels(train_labels)
+y2 = lb.transform(train_labels)
 
 X_test2, _ = preprocess_data(test2, scaler2)
 model.fit(X_train, y2, nb_epoch=19, batch_size=16, validation_split=0)
-op.result=model.predict_proba(X_test2)
+op.result = model.predict_proba(X_test2)
 op.write_result("submission_nn_19_full_0510.csv")
 
+'''
